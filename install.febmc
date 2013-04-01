@@ -14,8 +14,8 @@ $PARTED /dev/$DEVICE mkpart primary -- 600.0 -2
 $PARTED /dev/$DEVICE set 1 boot on
 $PARTPROBE /dev/$DEVICE
 
-$MKFS /dev/${DEVICE}1
-$MKFS /dev/${DEVICE}2
+$MKFS /dev/${DEVICE}1 -L bootfs
+$MKFS /dev/${DEVICE}2 -L rootfs
 
 DIR=`mktemp -d /var/tmp/febmc.XXXXXX`
 ROOT_DIR=$DIR/root_install
@@ -24,26 +24,26 @@ mkdir $ROOT_DIR
 
 dd if=/dev/zero of=$DIR/root.img bs=1M count=0 seek=2048
 ROOT_LOOP=`losetup -f --show $DIR/root.img`
-$MKFS $ROOT_LOOP
+$MKFS $ROOT_LOOP -L rootfs
 mount $ROOT_LOOP $ROOT_DIR
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install filesystem
 
 dd if=/dev/zero of=$DIR/boot.img bs=1M count=0 seek=512
 BOOT_LOOP=`losetup -f --show $DIR/boot.img`
-$MKFS $BOOT_LOOP
+$MKFS $BOOT_LOOP -L bootfs
 mount $BOOT_LOOP $ROOT_DIR/boot
 
-BOOT_UUID=`blkid /dev/${DEVICE}1 -ovalue | head -1`
-ROOT_UUID=`blkid /dev/${DEVICE}2 -ovalue | head -1`
+#BOOT_UUID=`blkid /dev/${DEVICE}1 -ovalue | head -1`
+#ROOT_UUID=`blkid /dev/${DEVICE}2 -ovalue | head -1`
 
-echo "UUID=\"$ROOT_UUID\" /                   ext4    defaults        1 1" >  $ROOT_DIR/etc/fstab
-echo "UUID=\"$BOOT_UUID\" /boot                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
+echo "LABEL=\"rootfs\" /                   ext4    defaults        1 1" >  $ROOT_DIR/etc/fstab
+echo "UUID=\"bootfs\" /boot                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum
 echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
 
-yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install mc vim kernel xbmc
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install e2fsprogs mc vim kernel xbmc
 
 mount -t proc proc $ROOT_DIR/proc
 mount -t sysfs sys $ROOT_DIR/sys
