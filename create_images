@@ -1,0 +1,51 @@
+#!/bin/sh
+
+MKFS=mkfs.ext4
+RUN_DIR=`pwd`
+OUT_DIR=$1
+
+DIR=/root/tym/febmc #`mktemp -d /var/tmp/febmc.XXXXXX`
+ROOT_DIR=$DIR/root_install
+
+#mkdir $ROOT_DIR
+
+#dd if=/dev/zero of=$DIR/root.img bs=1M count=0 seek=2048
+ROOT_LOOP=`losetup -f --show $DIR/root.img`
+#$MKFS $ROOT_LOOP -L rootfs
+mount $ROOT_LOOP $ROOT_DIR
+
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install filesystem
+
+#dd if=/dev/zero of=$DIR/boot.img bs=1M count=0 seek=512
+BOOT_LOOP=`losetup -f --show $DIR/boot.img`
+#$MKFS $BOOT_LOOP -L bootfs
+mount $BOOT_LOOP $ROOT_DIR/boot
+
+mount -t proc proc $ROOT_DIR/proc
+mount -t sysfs sys $ROOT_DIR/sys
+mount -obind /dev $ROOT_DIR/dev
+
+echo "LABEL=\"rootfs\" /                   ext4    defaults        1 1" >  $ROOT_DIR/etc/fstab
+echo "LABEL=\"bootfs\" /boot                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
+
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum
+echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
+
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e2fsprogs mc vim kernel xbmc
+
+(
+cd $ROOT_DIR
+chroot $ROOT_DIR sh -c 'echo -e "FeBMC\nFeBMC" | passwd root --stdin'
+chroot $ROOT_DIR grub2-mkconfig -o /boot/grub2/grub.cfg
+)
+sync
+umount $ROOT_DIR/proc
+umount $ROOT_DIR/sys
+umount $ROOT_DIR/dev
+umount $ROOT_DIR/boot
+umount $ROOT_DIR
+
+losetup -D
+
+mv $DIR/root.img $OUT_DIR
+mv $DIR/boot.img $OUT_DIR

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+DEVICE=sdb
+PARTED="parted -s -a cyl"
+PARTPROBE=partprobe
+MKFS=mkfs.ext4
+RUN_DIR=`pwd`
+DIR=$1
+
+$PARTED /dev/$DEVICE mktable msdos
+$PARTED /dev/$DEVICE mkpart primary -- 0.0 600.0
+$PARTED /dev/$DEVICE mkpart primary -- 600.0 -2
+$PARTED /dev/$DEVICE set 1 boot on
+$PARTPROBE /dev/$DEVICE
+
+$MKFS /dev/${DEVICE}1 -L bootfs
+$MKFS /dev/${DEVICE}2 -L rootfs
+
+dd if=$DIR/boot.img of=/dev/${DEVICE}1 bs=1M
+sync
+e2fsck -f /dev/${DEVICE}1
+resize2fs /dev/${DEVICE}1
+
+dd if=$DIR/root.img of=/dev/${DEVICE}2 bs=1M
+sync
+e2fsck -f /dev/${DEVICE}2
+resize2fs /dev/${DEVICE}2
+
+mount /dev/${DEVICE}2 $ROOT_DIR
+mount /dev/${DEVICE}1 $ROOT_DIR/boot
+mount -t proc proc $ROOT_DIR/proc
+mount -t sysfs sys $ROOT_DIR/sys
+mount -obind /dev $ROOT_DIR/dev
+(
+cd $ROOT_DIR
+chroot $ROOT_DIR grub2-install /dev/${DEVICE}
+)
+umount $ROOT_DIR/proc
+umount $ROOT_DIR/sys
+umount $ROOT_DIR/dev
+umount $ROOT_DIR/boot
+umount $ROOT_DIR
