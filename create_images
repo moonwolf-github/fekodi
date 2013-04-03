@@ -4,7 +4,7 @@ MKFS=mkfs.ext4
 RUN_DIR=`pwd`
 OUT_DIR=$1
 
-DIR=/root/tym/febmc #`mktemp -d /var/tmp/febmc.XXXXXX`
+DIR=`mktemp -d /var/tmp/febmc.XXXXXX`
 ROOT_DIR=$DIR/root_install
 
 mkdir $ROOT_DIR
