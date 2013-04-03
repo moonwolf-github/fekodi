@@ -1,24 +1,73 @@
 #!/bin/sh
 
+show_help()
+{
+   echo "Usage:"
+   echo "-h        This useful help"
+   echo "-u        Updates existing images (needs -i)"
+   echo "-i dir    Directory with images"
+   echo "-u dir    Directory where to put newly created images"
+   exit 0
+}
+
+TYPE="create"
+
+while getopts  "uo:i:h" i
+do
+    case "$i" in
+        u) TYPE="update";;
+        o) OUT_DIR=$OPTARG;;
+        i) DIR=$OPTARG;;
+        h) show_help; break;;
+    esac
+done
+
+if [ -z $OUT_DIR ]; then
+    echo "You must specify output directory!"
+    exit 1;
+fi
+
 MKFS=mkfs.ext4
 RUN_DIR=`pwd`
-OUT_DIR=$1
 
-DIR=`mktemp -d /var/tmp/febmc.XXXXXX`
+if [ $TYPE == "create" ]; then
+    DIR=`mktemp -d /var/tmp/febmc.XXXXXX`
+    mkdir $DIR
+else
+    if [ ! -d $DIR ]; then
+        echo "Directory '$DIR' does not exists!";
+        exit 1;
+    fi
+    if [ ! -f $DIR/rootfs.img -o ! -f $DIR/bootfs.img ]; then
+        echo "Images not found!";
+        exit 1;
+    fi
+fi
+
 ROOT_DIR=$DIR/root_install
 
-mkdir $ROOT_DIR
+if [ ! -d $ROOT_DIR ]; then
+    mkdir $ROOT_DIR
+fi
 
-dd if=/dev/zero of=$DIR/root.img bs=1M count=0 seek=2048
+if [ $TYPE == "create" ]; then
+    dd if=/dev/zero of=$DIR/root.img bs=1M count=0 seek=2048
+fi
 ROOT_LOOP=`losetup -f --show $DIR/root.img`
-$MKFS $ROOT_LOOP -L rootfs
+if [ $TYPE == "create" ]; then
+    $MKFS $ROOT_LOOP -L rootfs
+fi
 mount $ROOT_LOOP $ROOT_DIR
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install filesystem
 
-dd if=/dev/zero of=$DIR/boot.img bs=1M count=0 seek=512
+if [ $TYPE == "create" ]; then
+    dd if=/dev/zero of=$DIR/boot.img bs=1M count=0 seek=512
+fi
 BOOT_LOOP=`losetup -f --show $DIR/boot.img`
-$MKFS $BOOT_LOOP -L bootfs
+if [ $TYPE == "create" ]; then
+    $MKFS $BOOT_LOOP -L bootfs
+fi
 mount $BOOT_LOOP $ROOT_DIR/boot
 
 mount -t proc proc $ROOT_DIR/proc
@@ -28,7 +77,7 @@ mount -obind /dev $ROOT_DIR/dev
 echo "LABEL=\"rootfs\" /                   ext4    defaults        1 1" >  $ROOT_DIR/etc/fstab
 echo "LABEL=\"bootfs\" /boot                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
 
-yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum rpmfusion-free rpmfusion-nonfree
 echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e2fsprogs mc vim kernel xbmc
@@ -47,5 +96,7 @@ umount $ROOT_DIR
 
 losetup -D
 
-mv $DIR/root.img $OUT_DIR
-mv $DIR/boot.img $OUT_DIR
+if [ $TYPE == "create" ]; then
+    mv $DIR/root.img $OUT_DIR
+    mv $DIR/boot.img $OUT_DIR
+fi
