@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DEVICE=sdb
+DEVICE=$2
 PARTED="parted -s -a cyl"
 PARTPROBE=partprobe
 MKFS=mkfs.ext4
@@ -12,9 +12,6 @@ $PARTED /dev/$DEVICE mkpart primary -- 0.0 600.0
 $PARTED /dev/$DEVICE mkpart primary -- 600.0 -2
 $PARTED /dev/$DEVICE set 1 boot on
 $PARTPROBE /dev/$DEVICE
-
-$MKFS /dev/${DEVICE}1 -L bootfs
-$MKFS /dev/${DEVICE}2 -L rootfs
 
 dd if=$DIR/boot.img of=/dev/${DEVICE}1 bs=1M
 sync
