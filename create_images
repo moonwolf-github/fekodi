@@ -87,6 +87,7 @@ yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e
 cd $ROOT_DIR
 chroot $ROOT_DIR sh -c 'echo -e "FeBMC\nFeBMC" | passwd root --stdin'
 chroot $ROOT_DIR sh -c 'cp -f /etc/skel/{*,.*} /root/'
+chroot $ROOT_DIR useradd -mUp febmc feplayer
 chroot $ROOT_DIR grub2-mkconfig -o /boot/grub2/grub.cfg
 )
 sync
