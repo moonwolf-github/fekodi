@@ -3,13 +3,12 @@
 DEVICE=$2
 PARTED="parted -s -a cyl"
 PARTPROBE=partprobe
-MKFS=mkfs.ext4
-RUN_DIR=`pwd`
 DIR=$1
+ROOT_DIR=`mktemp -d /tmp/febmc.XXXXXX`
 
 $PARTED /dev/$DEVICE mktable msdos
-$PARTED /dev/$DEVICE mkpart primary -- 0.0 600.0
-$PARTED /dev/$DEVICE mkpart primary -- 600.0 -2
+$PARTED /dev/$DEVICE mkpart primary -- 5 620.0
+$PARTED /dev/$DEVICE mkpart primary -- 620.0 -2
 $PARTED /dev/$DEVICE set 1 boot on
 $PARTPROBE /dev/$DEVICE
 
