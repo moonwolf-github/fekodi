@@ -8,7 +8,8 @@ ROOT_DIR=`mktemp -d /tmp/febmc.XXXXXX`
 
 $PARTED /dev/$DEVICE mktable msdos
 $PARTED /dev/$DEVICE mkpart primary -- 5 620.0
-$PARTED /dev/$DEVICE mkpart primary -- 620.0 -2
+$PARTED /dev/$DEVICE mkpart primary -- 620.0 2668.0
+$PARTED /dev/$DEVICE mkpart primary -- 2048.0 -2
 $PARTED /dev/$DEVICE set 1 boot on
 $PARTPROBE /dev/$DEVICE
 
@@ -22,8 +23,14 @@ sync
 e2fsck -f /dev/${DEVICE}2
 resize2fs /dev/${DEVICE}2
 
+dd if=$DIR/home.img of=/dev/${DEVICE}3 bs=1M
+sync
+e2fsck -f /dev/${DEVICE}3
+resize2fs /dev/${DEVICE}3
+
 mount /dev/${DEVICE}2 $ROOT_DIR
 mount /dev/${DEVICE}1 $ROOT_DIR/boot
+mount /dev/${DEVICE}3 $ROOT_DIR/home
 mount -t proc proc $ROOT_DIR/proc
 mount -t sysfs sys $ROOT_DIR/sys
 mount -obind /dev $ROOT_DIR/dev
@@ -35,4 +42,5 @@ umount $ROOT_DIR/proc
 umount $ROOT_DIR/sys
 umount $ROOT_DIR/dev
 umount $ROOT_DIR/boot
+umount $ROOT_DIR/home
 umount $ROOT_DIR
