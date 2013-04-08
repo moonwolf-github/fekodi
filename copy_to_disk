@@ -8,8 +8,8 @@ ROOT_DIR=`mktemp -d /tmp/febmc.XXXXXX`
 
 $PARTED /dev/$DEVICE mktable msdos
 $PARTED /dev/$DEVICE mkpart primary -- 5 620.0
-$PARTED /dev/$DEVICE mkpart primary -- 620.0 2668.0
-$PARTED /dev/$DEVICE mkpart primary -- 2048.0 -2
+$PARTED /dev/$DEVICE mkpart primary -- 620.0 2800.0
+$PARTED /dev/$DEVICE mkpart primary -- 2800.0 -2
 $PARTED /dev/$DEVICE set 1 boot on
 $PARTPROBE /dev/$DEVICE
 
@@ -38,6 +38,8 @@ mount -obind /dev $ROOT_DIR/dev
 cd $ROOT_DIR
 chroot $ROOT_DIR grub2-install /dev/${DEVICE}
 )
+sync
+
 umount $ROOT_DIR/proc
 umount $ROOT_DIR/sys
 umount $ROOT_DIR/dev
