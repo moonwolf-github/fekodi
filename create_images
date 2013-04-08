@@ -71,12 +71,22 @@ if [ $TYPE == "create" ]; then
 fi
 mount $BOOT_LOOP $ROOT_DIR/boot
 
+if [ $TYPE == "create" ]; then
+    dd if=/dev/zero of=$DIR/home.img bs=1M count=0 seek=10
+fi
+HOME_LOOP=`losetup -f --show $DIR/home.img`
+if [ $TYPE == "create" ]; then
+    $MKFS $HOME_LOOP -L homefs
+fi
+mount $HOME_LOOP $ROOT_DIR/home
+
 mount -t proc proc $ROOT_DIR/proc
 mount -t sysfs sys $ROOT_DIR/sys
 mount -obind /dev $ROOT_DIR/dev
 
 echo "LABEL=\"rootfs\" /                   ext4    defaults        1 1" >  $ROOT_DIR/etc/fstab
 echo "LABEL=\"bootfs\" /boot                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
+echo "LABEL=\"homefs\" /home                   ext4    defaults        1 2" >>  $ROOT_DIR/etc/fstab
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum rpmfusion-free-release rpmfusion-nonfree-release
 echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
@@ -95,6 +105,7 @@ umount $ROOT_DIR/proc
 umount $ROOT_DIR/sys
 umount $ROOT_DIR/dev
 umount $ROOT_DIR/boot
+umount $ROOT_DIR/home
 umount $ROOT_DIR
 
 losetup -D
