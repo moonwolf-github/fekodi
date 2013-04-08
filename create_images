@@ -113,4 +113,5 @@ losetup -D
 if [ $TYPE == "create" ]; then
     mv $DIR/root.img $OUT_DIR
     mv $DIR/boot.img $OUT_DIR
+    mv $DIR/home.img $OUT_DIR
 fi
