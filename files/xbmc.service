@@ -1,0 +1,12 @@
+[Unit]
+Description = Starts instance of XBMC using xinit
+After = syslog.target
+
+[Service]
+User = feplayer
+Group = feplayer
+Type = simple
+ExecStart = /usr/bin/xinit /usr/bin/xbmc-standalone -- :0
+
+[Install]
+WantedBy = multi-user.target

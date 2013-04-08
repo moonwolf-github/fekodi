@@ -93,12 +93,15 @@ echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e2fsprogs mc vim kernel xbmc
 
+cp -f $RUN_DIR/files/xbmc.service $ROOT_DIR/etc/systemd/system
+
 (
 cd $ROOT_DIR
 chroot $ROOT_DIR sh -c 'echo -e "FeBMC\nFeBMC" | passwd root --stdin'
 chroot $ROOT_DIR sh -c 'cp -f /etc/skel/{*,.*} /root/'
 chroot $ROOT_DIR useradd -mUp febmc feplayer
 chroot $ROOT_DIR grub2-mkconfig -o /boot/grub2/grub.cfg
+chroot $ROOT_DIR systemctl enable xbmc.service
 )
 sync
 umount $ROOT_DIR/proc

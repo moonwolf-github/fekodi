@@ -1,0 +1,10 @@
+[Unit]
+Description = Sets IR keytable
+Before = xbmc.service
+
+[Service]
+Type = oneshot
+ExecStart = /usr/bin/ir-keytable -c -p SONY -w /opt/remote.ir_keytable
+
+[Install]
+WantedBy = multi-user.target
