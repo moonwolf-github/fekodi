@@ -91,17 +91,19 @@ echo "LABEL=\"homefs\" /home                   ext4    defaults        1 2" >>  
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum rpmfusion-free-release rpmfusion-nonfree-release
 echo "GRUB_CMDLINE_LINUX=\"nomodeset\"" > $ROOT_DIR/etc/default/grub
 
-yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron pulseaudio-module-x11
 
 cp -f $RUN_DIR/files/xbmc.service $ROOT_DIR/etc/systemd/system
-cp -f $RUN_DIR/files/xbmc.pkla $ROOT_DIR/etc/polkit-1/localauthority/50-local.d
+cp -f $RUN_DIR/files/80-xbmc.rules $ROOT_DIR/etc/polkit-1/rules.d
 
 (
 cd $ROOT_DIR
 chroot $ROOT_DIR sh -c 'echo -e "FeBMC\nFeBMC" | passwd root --stdin'
 chroot $ROOT_DIR sh -c 'cp -f /etc/skel/{*,.*} /root/'
-chroot $ROOT_DIR useradd -mUp febmc feplayer
+chroot $ROOT_DIR sh -c 'id feplayer ||  useradd -mUp febmc feplayer'
+chroot $ROOT_DIR systemctl enable rsyslog.service
 chroot $ROOT_DIR systemctl enable xbmc.service
+chroot $ROOT_DIR systemctl enable crond.service
 )
 sync
 umount $ROOT_DIR/proc

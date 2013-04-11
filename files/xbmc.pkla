@@ -1,6 +1,0 @@
-[Actions for xbmc user]
-Identity=unix-user:feplayer
-Action=org.freedesktop.consolekit.system.stop;org.freedesktop.consolekit.system.restart;org.freedesktop.consolekit.system.stop-multiple-users
-ResultAny=yes
-ResultInactive=yes
-ResultActive=yes
