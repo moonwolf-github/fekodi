@@ -6,7 +6,7 @@ show_help()
    echo "-h        This useful help"
    echo "-u        Updates existing images (needs -i)"
    echo "-i dir    Directory with images"
-   echo "-u dir    Directory where to put newly created images"
+   echo "-o dir    Directory where to put newly created images"
    exit 0
 }
 
