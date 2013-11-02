@@ -90,12 +90,15 @@ echo "LABEL=\"homefs\" /home                   ext4    defaults        1 2" >>  
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generic-release generic-release-notes rpm grub2 binutils yum rpmfusion-free-release rpmfusion-nonfree-release
 echo -e "GRUB_CMDLINE_LINUX=\"nomodeset\"\nGRUB_GFXPAYLOAD_LINUX=\"text\"" > $ROOT_DIR/etc/default/grub
-echo "NETWORKING=yes" > / $ROOT_DIR/etc/sysconfig/network
+echo "NETWORKING=yes" > $ROOT_DIR/etc/sysconfig/network
 
 yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install NetworkManager net-tools vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron pulseaudio-module-x11 dbus-x11 mesa-dri-drivers
 
 cp -f $RUN_DIR/files/xbmc.service $ROOT_DIR/etc/systemd/system
 cp -f $RUN_DIR/files/80-xbmc.rules $ROOT_DIR/etc/polkit-1/rules.d
+cp -f $ROOT_DIR/usr/share/X11/xorg.conf.d/50-synaptics.conf $RUN_DIR/files
+patch $RUN_DIR/files/50-synaptics.conf < $RUN_DIR/files/50-synaptics.conf.patch
+cp -f $RUN_DIR/files/50-synaptics.conf $ROOT_DIR/etc/X11/xorg.conf.d
 
 (
 cd $ROOT_DIR

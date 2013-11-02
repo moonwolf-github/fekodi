@@ -1,0 +1,13 @@
+--- 50-synaptics.conf	2013-11-02 11:19:22.440983161 +0100
++++ 50-synaptics.conf.new	2013-11-02 11:20:09.891656501 +0100
+@@ -2,6 +2,10 @@
+         Identifier "touchpad catchall"
+         Driver "synaptics"
+         MatchIsTouchpad "on"
++        # Enable left mouse button by tapping
++        Option  "TapButton1"  "1"
++        # Enable vertical scrolling
++        Option  "VertEdgeScroll"  "1"
+         MatchDevicePath "/dev/input/event*"
+ EndSection
+ 
