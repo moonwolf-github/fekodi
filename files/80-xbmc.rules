@@ -1,5 +1,5 @@
 polkit.addRule(function(action, subject) {
-    if (action.id == "org.freedesktop.consolekit.system.stop" || action.id == "org.freedesktop.consolekit.system.restart" || action.id == "org.freedesktop.consolekit.system.stop-multiple-users" && subject.user == "feplayer") {
+    if ((action.id.indexOf("power-off") >= 0 || action.id.indexOf("reboot") >= 0 || action.id.indexOf("suspend") >= 0 || action.id.indexOf("hibernate") >= 0) && subject.user == "feplayer") {
         return polkit.Result.YES;
     }
 });
