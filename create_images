@@ -92,13 +92,15 @@ yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generi
 echo -e "GRUB_CMDLINE_LINUX=\"nomodeset\"\nGRUB_GFXPAYLOAD_LINUX=\"text\"" > $ROOT_DIR/etc/default/grub
 echo "NETWORKING=yes" > $ROOT_DIR/etc/sysconfig/network
 
-yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install b43-openfwwf upower NetworkManager net-tools vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron pulseaudio-module-x11 dbus-x11 mesa-dri-drivers
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install chrony openssh-server v4l-utils b43-openfwwf upower NetworkManager net-tools vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron pulseaudio-module-x11 dbus-x11 mesa-dri-drivers
 
 cp -f $RUN_DIR/files/xbmc.service $ROOT_DIR/etc/systemd/system
 cp -f $RUN_DIR/files/80-xbmc.rules $ROOT_DIR/etc/polkit-1/rules.d
 cp -f $ROOT_DIR/usr/share/X11/xorg.conf.d/50-synaptics.conf $RUN_DIR/files
 patch $RUN_DIR/files/50-synaptics.conf < $RUN_DIR/files/50-synaptics.conf.patch
 cp -f $RUN_DIR/files/50-synaptics.conf $ROOT_DIR/etc/X11/xorg.conf.d
+install -D -m 644 -o root $RUN_DIR/files/ferguson.ir_keytable $ROOT_DIR/usr/local/share/ir_keytables/ferguson.ir_keytable
+install -m 644 -o root $RUN_DIR/files/ir_keytable.service $ROOT_DIR/etc/systemd/system/ir_keytable.service
 
 (
 cd $ROOT_DIR
