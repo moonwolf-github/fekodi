@@ -105,6 +105,7 @@ cd $ROOT_DIR
 chroot $ROOT_DIR sh -c 'echo -e "FeBMC\nFeBMC" | passwd root --stdin'
 chroot $ROOT_DIR sh -c 'cp -f /etc/skel/{*,.*} /root/'
 chroot $ROOT_DIR sh -c 'id feplayer ||  useradd -mUp febmc feplayer'
+chroot $ROOT_DIR sh -c 'usermod -G audio feplayer'
 chroot $ROOT_DIR systemctl enable rsyslog.service
 chroot $ROOT_DIR systemctl enable xbmc.service
 chroot $ROOT_DIR systemctl enable crond.service
