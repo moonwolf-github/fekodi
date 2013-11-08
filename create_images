@@ -99,8 +99,15 @@ cp -f $RUN_DIR/files/80-xbmc.rules $ROOT_DIR/etc/polkit-1/rules.d
 cp -f $ROOT_DIR/usr/share/X11/xorg.conf.d/50-synaptics.conf $RUN_DIR/files
 patch $RUN_DIR/files/50-synaptics.conf < $RUN_DIR/files/50-synaptics.conf.patch
 cp -f $RUN_DIR/files/50-synaptics.conf $ROOT_DIR/etc/X11/xorg.conf.d
-install -D -m 644 -o root $RUN_DIR/files/ferguson.ir_keytable $ROOT_DIR/usr/local/share/ir_keytables/ferguson.ir_keytable
+install -D -m 644 -o root $RUN_DIR/files/remote.ir_keytable $ROOT_DIR/usr/local/share/ir_keytables/remote.ir_keytable
 install -m 644 -o root $RUN_DIR/files/ir_keytable.service $ROOT_DIR/etc/systemd/system/ir_keytable.service
+
+# media directories - no music videos yet
+BASE_MEDIA_DIR=$ROOT_DIR/home/media
+MEDIA_DIRS=($BASE_MEDIA_DIR $BASE_MEDIA_DIR/local $BASE_MEDIA_DIR/local/movies $BASE_MEDIA_DIR/local/music $BASE_MEDIA_DIR/local/series $BASE_MEDIA_DIR/network $BASE_MEDIA_DIR/network/movies $BASE_MEDIA_DIR/network/music $BASE_MEDIA_DIR/network/series)
+for i in ${MEDIA_DIRS[*]}; do
+    [ -d $i ] || mkdir $i;
+done
 
 (
 cd $ROOT_DIR
