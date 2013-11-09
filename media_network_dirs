@@ -1,0 +1,4 @@
+SERIES=chamber:/mnt/magazyn/series
+MUSIC=chamber:/mnt/magazyn/music
+PHOTOS=chamber:/mnt/magazyn/photos
+MOVIES=chamber:/mnt/magazyn/movies
