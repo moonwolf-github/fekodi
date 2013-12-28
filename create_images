@@ -92,7 +92,7 @@ yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install generic-logos generi
 echo -e "GRUB_CMDLINE_LINUX=\"nomodeset\"\nGRUB_GFXPAYLOAD_LINUX=\"text\"" > $ROOT_DIR/etc/default/grub
 echo "NETWORKING=yes" > $ROOT_DIR/etc/sysconfig/network
 
-yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install libmad nfs-utils chrony openssh-server v4l-utils b43-openfwwf upower NetworkManager net-tools vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron pulseaudio-module-x11 dbus-x11 mesa-dri-drivers
+yum -y --installroot=$ROOT_DIR -c $RUN_DIR/yum.conf install alsa-utils libmad nfs-utils chrony openssh-server v4l-utils b43-openfwwf upower NetworkManager net-tools vim-minimal passwd e2fsprogs mc vim kernel xbmc xorg-x11-xinit xorg-x11-server-Xorg xorg-x11-drivers polkit rsyslog cronie cronie-anacron dbus-x11 mesa-dri-drivers
 
 cp -f $RUN_DIR/files/xbmc.service $ROOT_DIR/etc/systemd/system
 cp -f $RUN_DIR/files/80-xbmc.rules $ROOT_DIR/etc/polkit-1/rules.d
