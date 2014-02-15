@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for i in ui/*.ui; do
+    j=`basename $i .ui`;
+    pyuic4 $i -o src/Ui_${j}.py
+done
