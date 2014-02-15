@@ -1,0 +1,11 @@
+[Unit]
+Description = Boot configurator
+Before = xbmc.service
+
+[Service]
+Type = oneshot
+ExecStart = /usr/local/sbin/bootconfig
+ExecStartPost = /bin/systemctl disable bootconfig
+
+[Install]
+WantedBy = multi-user.target

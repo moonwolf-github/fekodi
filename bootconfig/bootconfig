@@ -1,0 +1,50 @@
+#!/bin/bash
+
+CONFIG_FILE="/bootconfig"
+
+#[ -f $CONFIG_FILE ] || exit 0
+
+read -p"Enable WiFi? (y/N)" -n 1 WIFI
+echo
+
+if [ ! -z $WIFI ]; then
+    if [ $WIFI == "y" -o $WIFI == "Y" ]; then
+        DONE=false
+        while [ ! $DONE ]; do
+            while [ -z $SSID ]; do
+                read -p "Enter SSID (L to list): " SSID;
+            done
+            if [ $SSID == "L" ]; then
+                nmcli c list;
+            else
+                DONE=true;
+            fi
+        done;
+        #read -p "Enter card name (wlan0): " CARD;
+        #if [ -z $CARD ]; then
+        #    CARD="wlan0";
+        #fi
+        echo "nmcli d wifi connect $SSID";
+    fi
+fi
+
+echo "Choose driver to install:"
+echo "1. NVIDIA"
+echo "2. ATI"
+echo "3. None"
+
+DRIVER="n"
+
+while [ $DRIVER != "1" -a $DRIVER != "2" -a $DRIVER != "3" ]; do
+    read -n 1 DRIVER;
+done
+
+if [ $DRIVER == "1" ]; then
+   yum install kmod-nvidia;
+fi;
+
+if [ $DRIVER == "2" ]; then
+   yum install kmod-catalyst;
+fi;
+
+#rm -rf $CONFIG_FILE
