@@ -14,8 +14,6 @@ services --enabled=NetworkManager
 rootpw --plaintext FeBMC
 user --name=feplayer --groups=audio,cdrom --password=febmc --plaintext
 
-#device virtio_blk
-
 #
 # Partition Information. Change this as necessary
 # This information is used by appliance-tools but
@@ -29,26 +27,20 @@ part / --size=2048 --fstype=ext4 --ondisk=sda
 #
 # Repositories
 #
-# To compose against the current release tree, use the following "repo" (enabled by default)
-#repo --name=released --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-9&arch=$basearch
-# To include updates, use the following "repo" (enabled by default)
-#repo --name=updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f9&arch=$basearch
-
-# To compose against rawhide, use the following "repo" (disabled by default)
-#repo --name=rawhide --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=rawhide&arch=$basearch
-
-# To compose against local trees, (edit and) use:
-repo --name=f18 --baseurl=http://upgrades.tech.sp/f18/$basearch/Everything/
-repo --name=f18-updates --baseurl=http://upgrades.tech.sp/f18/$basearch/updates
-repo --name=rpmfusion-free --baseurl=http://upgrades.tech.sp/f18/$basearch/rpmfusion/free/os
-repo --name=rpmfusion-free-updates --baseurl=http://upgrades.tech.sp/f18/$basearch/rpmfusion/free/updates
-repo --name=rpmfusion-nonfree --baseurl=http://upgrades.tech.sp/f18/$basearch/rpmfusion/nonfree/os
-repo --name=rpmfusion-nonfree-updates --baseurl=http://upgrades.tech.sp/f18/$basearch/rpmfusion/nonfree/updates
+repo --name=f20 --baseurl=http://upgrades.tech.sp/f20/$basearch/Everything/
+repo --name=f20-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/updates/
+repo --name=rpmfusion-free --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/free/os
+repo --name=rpmfusion-free-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/free/updates
+repo --name=rpmfusion-nonfree --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/nonfree/os
+repo --name=rpmfusion-nonfree-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/nonfree/updates
 
 #
 # Add all the packages after the base packages
 #
 %packages --excludedocs --nobase
+coreutils
+dracut
+dracut-config-rescue
 shadow-utils
 filesystem
 firewalld
@@ -58,6 +50,8 @@ generic-release-notes
 setup
 rpm
 grub2
+grub2-tools
+grubby
 binutils
 yum
 rpmfusion-free-release
@@ -92,7 +86,6 @@ syslinux-extlinux
 
 -fedora-logos
 -fedora-release-notes
--grub
 %end
 
 #
@@ -118,8 +111,8 @@ EOF
 cp -f /etc/skel/{*,.*} /root/
 
 # 'user' directive above doesn't work
-/usr/sbin/useradd -mUp febmc feplayer
-/usr/sbin/usermod -G audio,cdrom feplayer
+#/usr/sbin/useradd -mUp febmc feplayer
+#/usr/sbin/usermod -G audio,cdrom feplayer
 
 # media directories
 BASE_MEDIA_DIR=/home/media
@@ -138,6 +131,9 @@ echo "$MUSIC     ${MEDIA_DIRS[8]}              nfs    defaults,user,auto        
 echo "$SERIES    ${MEDIA_DIRS[9]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
 echo "$PHOTOS    ${MEDIA_DIRS[10]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
 echo "$MOVIES    ${MEDIA_DIRS[7]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
+
+# allow reboot and powering off
+#cat > /etc/polkit-1/rules.d/80-xbmc.rules << EOF
 
 %end
 
