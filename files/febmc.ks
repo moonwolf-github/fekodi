@@ -7,7 +7,7 @@ timezone Europe/Warsaw
 auth --useshadow --enablemd5
 selinux --disabled
 firewall --disabled
-bootloader --timeout=1 #--extlinux #--append="acpi=force console=ttyS0,115200"
+bootloader --timeout=10 #--extlinux #--append="acpi=force console=ttyS0,115200"
 network --bootproto=dhcp --device=eth0 --onboot=on
 services --enabled=NetworkManager
 
@@ -111,8 +111,8 @@ EOF
 cp -f /etc/skel/{*,.*} /root/
 
 # 'user' directive above doesn't work
-#/usr/sbin/useradd -mUp febmc feplayer
-#/usr/sbin/usermod -G audio,cdrom feplayer
+/usr/sbin/useradd -mUp febmc feplayer
+/usr/sbin/usermod -G audio,cdrom feplayer
 
 # media directories
 BASE_MEDIA_DIR=/home/media
@@ -122,10 +122,10 @@ for i in ${MEDIA_DIRS[*]}; do
     [ -d $ROOT_DIR/$i ] || mkdir $ROOT_DIR/$i;
 done
 
-SERIES=chamber:/mnt/magazyn/series
-MUSIC=chamber:/mnt/magazyn/music
-PHOTOS=chamber:/mnt/magazyn/photos
-MOVIES=chamber:/mnt/magazyn/movies
+SERIES=chamber.karakkhaz.dwarfs:/mnt/magazyn/series
+MUSIC=chamber.karakkhaz.dwarfs:/mnt/magazyn/music
+PHOTOS=chamber.karakkhaz.dwarfs:/mnt/magazyn/photos
+MOVIES=chamber.karakkhaz.dwarfs:/mnt/magazyn/movies
 
 echo "$MUSIC     ${MEDIA_DIRS[8]}              nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
 echo "$SERIES    ${MEDIA_DIRS[9]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
