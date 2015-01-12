@@ -133,7 +133,13 @@ echo "$PHOTOS    ${MEDIA_DIRS[10]}               nfs    defaults,user,auto      
 echo "$MOVIES    ${MEDIA_DIRS[7]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
 
 # allow reboot and powering off
-#cat > /etc/polkit-1/rules.d/80-xbmc.rules << EOF
+cat > /etc/polkit-1/rules.d/80-xbmc.rules << EOF
+polkit.addRule(function(action, subject) {
+    if ((action.id.indexOf("power-off") >= 0 || action.id.indexOf("reboot") >= 0 || action.id.indexOf("suspend") >= 0 || action.id.indexOf("hibernate") >= 0) && subject.user == "feplayer") {
+        return polkit.Result.YES;
+    }
+});
+EOF
 
 %end
 
