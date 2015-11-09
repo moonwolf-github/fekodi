@@ -7,7 +7,7 @@ timezone Europe/Warsaw
 auth --useshadow --enablemd5
 selinux --disabled
 firewall --disabled
-bootloader --timeout=10 #--extlinux #--append="acpi=force console=ttyS0,115200"
+bootloader --timeout=10 --extlinux #--append="acpi=force console=ttyS0,115200"
 network --bootproto=dhcp --device=eth0 --onboot=on
 services --enabled=NetworkManager
 
@@ -21,8 +21,8 @@ user --name=feplayer --groups=audio,cdrom --password=febmc --plaintext
 #
 zerombr
 clearpart --all
-#part /boot --fstype=ext4 --ondisk=sda --size=500
-part / --size=2048 --fstype=ext4 --ondisk=sda
+part /boot --fstype=ext4 --ondisk=sda --size=50
+part / --size=1400 --fstype=ext4 --ondisk=sda
 
 #
 # Repositories
