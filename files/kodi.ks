@@ -21,18 +21,18 @@ user --name=feplayer --groups=audio,cdrom --password=febmc --plaintext
 #
 zerombr
 clearpart --all
-part /boot --fstype=ext4 --ondisk=sda --size=50
-part / --size=1400 --fstype=ext4 --ondisk=sda
+part /boot --fstype=ext4 --ondisk=sda --size=500
+part / --size=2048 --fstype=ext4 --ondisk=sda
 
 #
 # Repositories
 #
-repo --name=f20 --baseurl=http://upgrades.tech.sp/f20/$basearch/Everything/
-repo --name=f20-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/updates/
-repo --name=rpmfusion-free --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/free/os
-repo --name=rpmfusion-free-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/free/updates
-repo --name=rpmfusion-nonfree --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/nonfree/os
-repo --name=rpmfusion-nonfree-updates --baseurl=http://upgrades.tech.sp/f20/$basearch/rpmfusion/nonfree/updates
+repo --name=f22 --baseurl=http://upgrades.tech.sp/f22/release/Everything/$basearch/os
+repo --name=f22-updates --baseurl=http://upgrades.tech.sp/f22/updates/$basearch/
+repo --name=rpmfusion-free --baseurl=http://upgrades.tech.sp/rpmfusion/f22/release/free/Everything/$basearch/os
+repo --name=rpmfusion-free-updates --baseurl=http://upgrades.tech.sp/rpmfusion/f22/updates/free/$basearch/
+repo --name=rpmfusion-nonfree --baseurl=http://upgrades.tech.sp/rpmfusion/f22/release/nonfree/Everything/$basearch/os
+repo --name=rpmfusion-nonfree-updates --baseurl=http://upgrades.tech.sp/rpmfusion/f22/updates/free/$basearch/
 
 #
 # Add all the packages after the base packages
@@ -72,7 +72,7 @@ e2fsprogs
 mc
 vim
 kernel
-xbmc
+kodi
 xorg-x11-xinit
 xorg-x11-server-Xorg
 xorg-x11-drivers
@@ -92,29 +92,28 @@ syslinux-extlinux
 # Add custom post scripts after the base post.
 #
 %post
-cat > /etc/systemd/system/xbmc.service << EOF
+cat > /etc/systemd/system/kodi.service << EOF
 [Unit]
-Description = Starts instance of XBMC using xinit
+Description = Starts instance of Kodi using xinit
 After = syslog.target
 
 [Service]
 User = feplayer
 Group = feplayer
 Type = simple
-ExecStart = /usr/bin/xinit /usr/bin/xbmc-standalone -- :0
+ExecStart = /usr/bin/xinit /usr/bin/kodi-standalone -- :0
 
 [Install]
 WantedBy = default.target
 EOF
-/usr/bin/systemctl enable xbmc.service
+/usr/bin/systemctl enable kodi.service
 
 cp -f /etc/skel/{*,.*} /root/
 
-# 'user' directive above doesn't work
 /usr/sbin/useradd -mUp febmc feplayer
 /usr/sbin/usermod -G audio,cdrom feplayer
 
-# media directories
+# media directories - it belongs to config program not here
 BASE_MEDIA_DIR=/home/media
 MEDIA_DIRS=($BASE_MEDIA_DIR $BASE_MEDIA_DIR/local $BASE_MEDIA_DIR/local/movies $BASE_MEDIA_DIR/local/music $BASE_MEDIA_DIR/local/series $BASE_MEDIA_DIR/local/photos $BASE_MEDIA_DIR/network
 $BASE_MEDIA_DIR/network/movies $BASE_MEDIA_DIR/network/music $BASE_MEDIA_DIR/network/series $BASE_MEDIA_DIR/network/photos)
@@ -133,7 +132,7 @@ echo "$PHOTOS    ${MEDIA_DIRS[10]}               nfs    defaults,user,auto      
 echo "$MOVIES    ${MEDIA_DIRS[7]}               nfs    defaults,user,auto        0 0" >>  $ROOT_DIR/etc/fstab
 
 # allow reboot and powering off
-cat > /etc/polkit-1/rules.d/80-xbmc.rules << EOF
+cat > /etc/polkit-1/rules.d/80-kodi.rules << EOF
 polkit.addRule(function(action, subject) {
     if ((action.id.indexOf("power-off") >= 0 || action.id.indexOf("reboot") >= 0 || action.id.indexOf("suspend") >= 0 || action.id.indexOf("hibernate") >= 0) && subject.user == "feplayer") {
         return polkit.Result.YES;
@@ -141,5 +140,9 @@ polkit.addRule(function(action, subject) {
 });
 EOF
 
+cat > /etc/X11/Xwrapper.config << EOF
+allowed_users = anybody
+needs_root_rights = yes
+EOF
 %end
 
