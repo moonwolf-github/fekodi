@@ -37,7 +37,7 @@ repo --name=rpmfusion-nonfree-updates --baseurl=http://upgrades.tech.sp/rpmfusio
 #
 # Add all the packages after the base packages
 #
-%packages --excludedocs --nobase
+%packages --excludedocs
 coreutils
 dracut
 dracut-config-rescue
@@ -83,6 +83,7 @@ cronie-anacron
 dbus-x11
 mesa-dri-drivers
 syslinux-extlinux
+NetworkManager-wifi
 
 -fedora-logos
 -fedora-release-notes
